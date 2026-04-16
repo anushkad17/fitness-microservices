@@ -16,6 +16,7 @@
 	<groupId>com.fitness</groupId>
 	<artifactId>userservice</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
+	<packaging>jar</packaging>
 	<name>userservice</name>
 	<description>User Service for Fitness Microservice</description>
 

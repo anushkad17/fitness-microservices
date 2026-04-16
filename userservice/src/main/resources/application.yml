@@ -3,4 +3,4 @@ spring:
     name: userservice
 
   config:
-    import: configserver:http://localhost:8888
+    import: optional:configserver:https://configserver-hdte.onrender.com
