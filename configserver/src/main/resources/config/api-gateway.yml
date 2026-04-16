@@ -35,7 +35,7 @@ server:
 eureka:
   client:
     service-url:
-      defaultZone: http://localhost:8761/eureka
+      defaultZone: https://eureka-server-x9j7.onrender.com/eureka
 
   instance:
     hostname: localhost
