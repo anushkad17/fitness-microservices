@@ -1,0 +1,43 @@
+spring:
+  application:
+    name: api-gateway
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${KEYCLOAK_ISSUER_URI}
+          jwk-set-uri: https://keycloak-deploy-st9e.onrender.com/realms/fitness-oauth2/protocol/openid-connect/certs
+  cloud:
+    gateway:
+      default-filters:
+        - TokenRelay
+
+      routes:
+        - id: userservice
+          uri: lb://USERSERVICE
+          predicates:
+            - Path=/api/users/**
+
+        - id: activityservice
+          uri: lb://ACTIVITYSERVICE
+          predicates:
+            - Path=/api/activities/**   # cleaner
+
+        - id: aiservice
+          uri: lb://AISERVICE
+          predicates:
+            - Path=/api/recommendations/**
+
+server:
+  port: 8080
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+
+  instance:
+    hostname: localhost
+    prefer-ip-address: true
+    ip-address: 127.0.0.1

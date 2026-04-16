@@ -1,0 +1,14 @@
+# Java
+target/
+*.log
+
+# Node
+node_modules/
+dist/
+
+# Env (VERY IMPORTANT)
+.env
+
+# IDE
+.idea/
+*.iml
