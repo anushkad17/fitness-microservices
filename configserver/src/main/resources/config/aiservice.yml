@@ -3,14 +3,12 @@ spring:
     mongodb:
       uri: ${MONGO_AI_URI}
   rabbitmq:
-    host: localhost
-    port: 5672
-    username: guest
-    password: guest
+    addresses: ${SPRING_RABBITMQ_ADDRESSES}
     listener:
       simple:
         message-converter:
           trusted-packages: "*"
+
 
 eureka:
   client:
@@ -18,10 +16,8 @@ eureka:
       defaultZone: https://eureka-server-x9j7.onrender.com/eureka
   instance:
     prefer-ip-address: true
-    ip-address: 127.0.0.1
-    hostname: localhost
     instance-id: ${spring.application.name}:${server.port}
-    non-secure-port: 8083
+
 
 server:
   port: 8083

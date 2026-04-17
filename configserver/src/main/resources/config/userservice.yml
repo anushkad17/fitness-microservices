@@ -18,6 +18,4 @@ eureka:
       defaultZone: https://eureka-server-x9j7.onrender.com/eureka
 
   instance:
-    hostname: localhost
     prefer-ip-address: true
-    ip-address: 127.0.0.1

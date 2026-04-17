@@ -15,17 +15,17 @@ spring:
 
       routes:
         - id: userservice
-          uri: lb://USERSERVICE
+          uri: lb://userservice
           predicates:
             - Path=/api/users/**
 
         - id: activityservice
-          uri: lb://ACTIVITYSERVICE
+          uri: lb://activityservice
           predicates:
-            - Path=/api/activities/**   # cleaner
+            - Path=/api/activities/**
 
         - id: aiservice
-          uri: lb://AISERVICE
+          uri: lb://aiservice
           predicates:
             - Path=/api/recommendations/**
 
@@ -38,6 +38,4 @@ eureka:
       defaultZone: https://eureka-server-x9j7.onrender.com/eureka
 
   instance:
-    hostname: localhost
     prefer-ip-address: true
-    ip-address: 127.0.0.1
