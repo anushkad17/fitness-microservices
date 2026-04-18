@@ -30,57 +30,67 @@ public class ActivityService {
     private String routingKey;
 
     // ================================
-    // CREATE ACTIVITY
+    // CREATE ACTIVITY (FULL SAFE)
     // ================================
     public ActivityResponse trackActivity(ActivityRequest request) {
 
         log.info("Tracking activity for userId: {}", request.getUserId());
 
-        // ✅ SAFE USER VALIDATION (no crash)
+        // 🔒 SAFE USER VALIDATION
         try {
-            boolean isValidUser = userValidationService.validateUser(request.getUserId());
-            if (!isValidUser) {
-                log.warn("User validation failed for userId: {}", request.getUserId());
-            }
+            userValidationService.validateUser(request.getUserId());
         } catch (Exception e) {
-            log.warn("Skipping user validation due to error: {}", e.getMessage());
+            log.warn("User validation skipped: {}", e.getMessage());
         }
 
-        // ✅ Create activity
-        Activity activity = Activity.builder()
-                .userId(request.getUserId())
-                .type(request.getType())
-                .duration(request.getDuration())
-                .caloriesBurned(request.getCaloriesBurned())
-                .startTime(request.getStartTime())
-                .additionalMetrics(request.getAdditionalMetrics())
-                .build();
+        Activity savedActivity;
 
-        Activity savedActivity = activityRepository.save(activity);
+        try {
+            Activity activity = Activity.builder()
+                    .userId(request.getUserId())
+                    .type(request.getType())
+                    .duration(request.getDuration())
+                    .caloriesBurned(request.getCaloriesBurned())
+                    .startTime(request.getStartTime())
+                    .additionalMetrics(request.getAdditionalMetrics())
+                    .build();
 
-        // ✅ Publish to RabbitMQ (safe)
+            savedActivity = activityRepository.save(activity);
+
+        } catch (Exception e) {
+            log.error("❌ MongoDB SAVE FAILED", e);
+            throw new RuntimeException("Database error while saving activity");
+        }
+
+        // 🔒 SAFE RABBITMQ
         try {
             rabbitTemplate.convertAndSend(exchange, routingKey, savedActivity);
         } catch (Exception e) {
-            log.error("Failed to publish activity to RabbitMQ: ", e);
+            log.warn("RabbitMQ failed (ignored): {}", e.getMessage());
         }
 
         return mapToResponse(savedActivity);
     }
 
     // ================================
-    // GET USER ACTIVITIES (🔥 FIXED)
+    // GET USER ACTIVITIES (SAFE)
     // ================================
     public List<ActivityResponse> getUserActivities(String userId) {
 
         log.info("Fetching activities for userId: {}", userId);
 
-        List<Activity> activities = activityRepository.findByUserId(userId);
+        List<Activity> activities;
 
-        // 🔥 CRITICAL FIX (prevents 500 error)
+        try {
+            activities = activityRepository.findByUserId(userId);
+        } catch (Exception e) {
+            log.error("❌ MongoDB FETCH FAILED", e);
+            return Collections.emptyList();
+        }
+
         if (activities == null || activities.isEmpty()) {
             log.warn("No activities found for userId: {}", userId);
-            return Collections.emptyList(); // ✅ safe return
+            return Collections.emptyList();
         }
 
         return activities.stream()
@@ -89,26 +99,17 @@ public class ActivityService {
     }
 
     // ================================
-    // GET SINGLE ACTIVITY
+    // GET BY ID
     // ================================
     public ActivityResponse getActivityById(String activityId) {
-
-        log.info("Fetching activity with id: {}", activityId);
-
         return activityRepository.findById(activityId)
                 .map(this::mapToResponse)
                 .orElseThrow(() ->
                         new RuntimeException("Activity not found with id: " + activityId));
     }
 
-    // ================================
-    // MAPPER
-    // ================================
     private ActivityResponse mapToResponse(Activity activity) {
-
-        if (activity == null) {
-            return null; // extra safety
-        }
+        if (activity == null) return null;
 
         ActivityResponse response = new ActivityResponse();
         response.setId(activity.getId());
