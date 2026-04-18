@@ -10,6 +10,7 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,7 +29,12 @@ public class ActivityService {
     @Value("${rabbitmq.routing.key}")
     private String routingKey;
 
+    // ================================
+    // CREATE ACTIVITY
+    // ================================
     public ActivityResponse trackActivity(ActivityRequest request) {
+
+        log.info("Tracking activity for userId: {}", request.getUserId());
 
         // ✅ SAFE USER VALIDATION (no crash)
         try {
@@ -62,7 +68,48 @@ public class ActivityService {
         return mapToResponse(savedActivity);
     }
 
+    // ================================
+    // GET USER ACTIVITIES (🔥 FIXED)
+    // ================================
+    public List<ActivityResponse> getUserActivities(String userId) {
+
+        log.info("Fetching activities for userId: {}", userId);
+
+        List<Activity> activities = activityRepository.findByUserId(userId);
+
+        // 🔥 CRITICAL FIX (prevents 500 error)
+        if (activities == null || activities.isEmpty()) {
+            log.warn("No activities found for userId: {}", userId);
+            return Collections.emptyList(); // ✅ safe return
+        }
+
+        return activities.stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
+    }
+
+    // ================================
+    // GET SINGLE ACTIVITY
+    // ================================
+    public ActivityResponse getActivityById(String activityId) {
+
+        log.info("Fetching activity with id: {}", activityId);
+
+        return activityRepository.findById(activityId)
+                .map(this::mapToResponse)
+                .orElseThrow(() ->
+                        new RuntimeException("Activity not found with id: " + activityId));
+    }
+
+    // ================================
+    // MAPPER
+    // ================================
     private ActivityResponse mapToResponse(Activity activity) {
+
+        if (activity == null) {
+            return null; // extra safety
+        }
+
         ActivityResponse response = new ActivityResponse();
         response.setId(activity.getId());
         response.setUserId(activity.getUserId());
@@ -73,20 +120,7 @@ public class ActivityService {
         response.setAdditionalMetrics(activity.getAdditionalMetrics());
         response.setCreatedAt(activity.getCreatedAt());
         response.setUpdatedAt(activity.getUpdatedAt());
+
         return response;
-    }
-
-    public List<ActivityResponse> getUserActivities(String userId) {
-        List<Activity> activities = activityRepository.findByUserId(userId);
-        return activities.stream()
-                .map(this::mapToResponse)
-                .collect(Collectors.toList());
-    }
-
-    public ActivityResponse getActivityById(String activityId) {
-        return activityRepository.findById(activityId)
-                .map(this::mapToResponse)
-                .orElseThrow(() ->
-                        new RuntimeException("Activity not found with id: " + activityId));
     }
 }
