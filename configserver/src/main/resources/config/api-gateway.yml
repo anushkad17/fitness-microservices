@@ -15,7 +15,7 @@ spring:
 
       routes:
         - id: userservice
-          uri: https://your-userservice.onrender.com
+          uri: https://userservice-n20l.onrender.com
           predicates:
             - Path=/api/users/**
 
@@ -25,7 +25,7 @@ spring:
             - Path=/api/activities/**
 
         - id: aiservice
-          uri: https://your-aiservice.onrender.com
+          uri: https://aiservice-z1dw.onrender.com
           predicates:
             - Path=/api/recommendations/**
 

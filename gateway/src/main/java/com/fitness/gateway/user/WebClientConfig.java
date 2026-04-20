@@ -18,7 +18,7 @@ public class WebClientConfig {
     @Bean
     public WebClient userServiceWebClient(WebClient.Builder webClientBuilder) {
         return webClientBuilder
-                .baseUrl("http://USERSERVICE")
+                .baseUrl("https://userservice-n20l.onrender.com")
                 .build();
     }
 }
