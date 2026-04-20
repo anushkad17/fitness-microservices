@@ -11,7 +11,7 @@ spring:
   cloud:
     gateway:
       default-filters:
-        - TokenRelay
+        - PreserveHostHeader
 
       routes:
         - id: userservice
