@@ -4,6 +4,7 @@ import com.fitness.activityservice.dto.ActivityRequest;
 import com.fitness.activityservice.dto.ActivityResponse;
 import com.fitness.activityservice.service.ActivityService;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -14,41 +15,50 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/activities")
 @AllArgsConstructor
+@Slf4j
 public class ActivityController {
 
-    private ActivityService activityService;
+    private final ActivityService activityService;
 
-    //  CREATE ACTIVITY
+    // =========================
+    // CREATE ACTIVITY
+    // =========================
     @PostMapping
     public ResponseEntity<ActivityResponse> trackActivity(
             @RequestBody ActivityRequest request,
             Authentication authentication) {
 
-        Jwt jwt = (Jwt) authentication.getPrincipal();
-        String userId = jwt.getSubject(); //  Extract from token
+        if (!(authentication != null && authentication.getPrincipal() instanceof Jwt jwt)) {
+            log.warn("Unauthorized POST /activities");
+            return ResponseEntity.status(401).build();  // ✅ no 500
+        }
 
+        String userId = jwt.getSubject();
         request.setUserId(userId);
 
         return ResponseEntity.ok(activityService.trackActivity(request));
     }
 
-    //  GET ALL ACTIVITIES FOR USER
+    // =========================
+    // GET ALL ACTIVITIES
+    // =========================
     @GetMapping
     public ResponseEntity<List<ActivityResponse>> getUserActivities(
             Authentication authentication) {
 
-        String userId = null;
+        if (!(authentication != null && authentication.getPrincipal() instanceof Jwt jwt)) {
+            log.warn("Unauthorized GET /activities");
+            return ResponseEntity.status(401).build();  // ✅ no 500
+        }
 
-        if (authentication != null && authentication.getPrincipal() instanceof Jwt jwt) {
-            userId = jwt.getSubject();
-        } else {
-            throw new RuntimeException("Unauthorized: JWT missing");
-        } //  Extract from token
+        String userId = jwt.getSubject();
 
         return ResponseEntity.ok(activityService.getUserActivities(userId));
     }
 
-    //  GET SINGLE ACTIVITY
+    // =========================
+    // GET BY ID
+    // =========================
     @GetMapping("/{activityId}")
     public ResponseEntity<ActivityResponse> getActivity(
             @PathVariable String activityId) {

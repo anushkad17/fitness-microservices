@@ -29,6 +29,8 @@ public class Activity {
 
     private Integer duration;
     private Integer caloriesBurned;
+
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime startTime;
 
     @Field("metrics")
