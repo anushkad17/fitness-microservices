@@ -9,11 +9,12 @@ import java.util.Map;
 
 @Data
 public class ActivityRequest {
+    private Long id;
     private String userId;
     private ActivityType type;
     private Integer duration;
     private Integer caloriesBurned;
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime startTime;
-    private Map<String, Object> additionalMetrics;
+    private String additionalMetrics;
 }
