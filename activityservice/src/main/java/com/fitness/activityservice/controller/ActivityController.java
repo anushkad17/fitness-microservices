@@ -28,15 +28,26 @@ public class ActivityController {
             @RequestBody ActivityRequest request,
             Authentication authentication) {
 
-        if (!(authentication != null && authentication.getPrincipal() instanceof Jwt jwt)) {
-            log.warn("Unauthorized POST /activities");
-            return ResponseEntity.status(401).build();  // ✅ no 500
+        try {
+            String userId;
+
+            if (authentication != null && authentication.getPrincipal() instanceof Jwt jwt) {
+                userId = jwt.getSubject();
+            } else if (authentication != null) {
+                userId = authentication.getName(); // ✅ fallback
+            } else {
+                log.warn("Unauthorized POST /activities");
+                return ResponseEntity.status(401).build();
+            }
+
+            request.setUserId(userId);
+
+            return ResponseEntity.ok(activityService.trackActivity(request));
+
+        } catch (Exception e) {
+            log.error("Error in trackActivity", e);
+            return ResponseEntity.status(500).build();
         }
-
-        String userId = jwt.getSubject();
-        request.setUserId(userId);
-
-        return ResponseEntity.ok(activityService.trackActivity(request));
     }
 
     // =========================
@@ -46,28 +57,47 @@ public class ActivityController {
     public ResponseEntity<List<ActivityResponse>> getUserActivities(
             Authentication authentication) {
 
-        if (!(authentication != null && authentication.getPrincipal() instanceof Jwt jwt)) {
-            log.warn("Unauthorized GET /activities");
-            return ResponseEntity.status(401).build();  // ✅ no 500
+        try {
+            String userId;
+
+            if (authentication != null && authentication.getPrincipal() instanceof Jwt jwt) {
+                userId = jwt.getSubject();
+            } else if (authentication != null) {
+                userId = authentication.getName(); // ✅ fallback
+            } else {
+                log.warn("Unauthorized GET /activities");
+                return ResponseEntity.status(401).build();
+            }
+
+            return ResponseEntity.ok(activityService.getUserActivities(userId));
+
+        } catch (Exception e) {
+            log.error("Error in getUserActivities", e);
+            return ResponseEntity.status(500).build();
         }
-
-        String userId = jwt.getSubject();
-
-        return ResponseEntity.ok(activityService.getUserActivities(userId));
     }
 
     // =========================
-    // GET BY ID
+    // GET SINGLE ACTIVITY
     // =========================
     @GetMapping("/{activityId}")
     public ResponseEntity<ActivityResponse> getActivity(
             @PathVariable String activityId) {
 
-        return ResponseEntity.ok(activityService.getActivityById(activityId));
+        try {
+            return ResponseEntity.ok(activityService.getActivityById(activityId));
+        } catch (Exception e) {
+            log.error("Error fetching activity by id", e);
+            return ResponseEntity.status(500).build();
+        }
     }
 
+    // =========================
+    // DEBUG TEST ENDPOINT
+    // =========================
     @GetMapping("/test")
-    public String test() {
-        return "NEW CODE DEPLOYED";
+    public ResponseEntity<String> test() {
+        return ResponseEntity.ok("ACTIVITY SERVICE WORKING ✅");
     }
 }
+
