@@ -4,28 +4,24 @@ spring:
 
   data:
     mongodb:
-      uri:  ${MONGO_ACTIVITY_URI}
+      uri: ${MONGO_ACTIVITY_URI}
 
   rabbitmq:
-    spring:
-      rabbitmq:
-        addresses: ${SPRING_RABBITMQ_ADDRESSES}
+    addresses: ${SPRING_RABBITMQ_ADDRESSES}
+
   security:
     oauth2:
       resourceserver:
         jwt:
           issuer-uri: ${KEYCLOAK_ISSUER_URI}
+
 server:
   port: 8082
 
+
 eureka:
   client:
-    service-url:
-      defaultZone: https://eureka-server-x9j7.onrender.com/eureka
-
-  instance:
-    prefer-ip-address: true
-
+    enabled: false
 
 rabbitmq:
   exchange:
