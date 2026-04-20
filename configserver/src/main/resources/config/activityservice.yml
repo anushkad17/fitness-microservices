@@ -10,10 +10,18 @@ spring:
     config:
       enabled: false   # ✅ ADD THIS
 
+
+
   datasource:
     url: ${ACTIVITY_DB_URL}
     username: ${ACTIVITY_DB_USERNAME}
     password: ${ACTIVITY_DB_PASSWORD}
+
+    hikari:
+      max-lifetime: 180000 # 3 minutes
+      connection-timeout: 30000
+      validation-timeout: 5000
+
   jpa:
     hibernate:
       ddl-auto: update
