@@ -30,6 +30,8 @@ spring:
           uri: https://activityservice-pcce.onrender.com
           predicates:
             - Path=/api/activities/**
+          filters:
+            - StripPrefix=1
 
         - id: aiservice
           uri: https://aiservice-z1dw.onrender.com
