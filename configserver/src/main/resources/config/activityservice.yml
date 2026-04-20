@@ -2,6 +2,10 @@ spring:
   application:
     name: activityservice
 
+  cloud:
+    config:
+      enabled: false   # ✅ ADD THIS
+
   data:
     mongodb:
       uri: ${MONGO_ACTIVITY_URI}
@@ -17,7 +21,6 @@ spring:
 
 server:
   port: 8082
-
 
 eureka:
   client:
