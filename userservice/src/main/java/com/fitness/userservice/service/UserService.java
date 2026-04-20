@@ -15,40 +15,35 @@ public class UserService {
     private UserRepository repository;
 
     public UserResponse register(RegisterRequest request) {
+        User userToSave;
 
         if (repository.existsByEmail(request.getEmail())) {
-            User existingUser = repository.findByEmail(request.getEmail());
-            UserResponse userResponse = new UserResponse();
-            userResponse.setId(existingUser.getId());
-            userResponse.setKeycloakId(existingUser.getKeycloakId());
-            userResponse.setPassword(existingUser.getPassword());
-            userResponse.setEmail(existingUser.getEmail());
-            userResponse.setFirstName(existingUser.getFirstName());
-            userResponse.setLastName(existingUser.getLastName());
-            userResponse.setCreatedAt(existingUser.getCreatedAt());
-            userResponse.setUpdatedAt(existingUser.getUpdatedAt());
-            return userResponse;
+            userToSave = repository.findByEmail(request.getEmail());
+        } else {
+            userToSave = new User();
+            userToSave.setEmail(request.getEmail());
+            userToSave.setPassword(request.getPassword());
+            userToSave.setKeycloakId(request.getKeycloakId());
+            userToSave.setFirstName(request.getFirstName());
+            userToSave.setLastName(request.getLastName());
+            userToSave = repository.save(userToSave);
         }
 
-        User user = new User();
-        user.setEmail(request.getEmail());
-        user.setPassword(request.getPassword());
-        user.setKeycloakId(request.getKeycloakId());
-        user.setFirstName(request.getFirstName());
-        user.setLastName(request.getLastName());
+        return mapToResponse(userToSave);
+    }
 
-        User savedUser = repository.save(user);
-        UserResponse userResponse = new UserResponse();
-        userResponse.setKeycloakId(savedUser.getKeycloakId());
-        userResponse.setId(savedUser.getId());
-        userResponse.setPassword(savedUser.getPassword());
-        userResponse.setEmail(savedUser.getEmail());
-        userResponse.setFirstName(savedUser.getFirstName());
-        userResponse.setLastName(savedUser.getLastName());
-        userResponse.setCreatedAt(savedUser.getCreatedAt());
-        userResponse.setUpdatedAt(savedUser.getUpdatedAt());
-
-        return userResponse;
+    // Helper method to avoid repeating mapping code
+    private UserResponse mapToResponse(User user) {
+        UserResponse response = new UserResponse();
+        response.setId(user.getId());
+        response.setKeycloakId(user.getKeycloakId());
+        response.setEmail(user.getEmail());
+        response.setFirstName(user.getFirstName());
+        response.setLastName(user.getLastName());
+        response.setCreatedAt(user.getCreatedAt());
+        response.setUpdatedAt(user.getUpdatedAt());
+        // Never return the password in a Response DTO for security!
+        return response;
     }
 
     public UserResponse getUserProfile(String userId) {
