@@ -1,6 +1,10 @@
 package com.fitness.activityservice.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import jakarta.persistence.Column;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -8,20 +12,20 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.Field;
+
 
 import java.time.LocalDateTime;
 import java.util.Map;
 
-@Document(collection = "activities")
+@Table(name = "activities")
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class Activity {
     @Id
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
     private String userId;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING)
@@ -33,8 +37,8 @@ public class Activity {
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime startTime;
 
-    @Field("metrics")
-    private Map<String, Object> additionalMetrics;
+    @Column(columnDefinition = "TEXT")
+    private String additionalMetrics;
 
     @CreatedDate
     private LocalDateTime createdAt;

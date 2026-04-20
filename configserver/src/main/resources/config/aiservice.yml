@@ -1,7 +1,13 @@
 spring:
-  data:
-    mongodb:
-      uri: ${MONGO_AI_URI}
+  datasource:
+    url: ${AI_DB_URL}
+    username: ${AI_DB_USERNAME}
+    password: ${AI_DB_PASSWORD}
+
+    jpa:
+      hibernate:
+        ddl-auto: update
+      database-platform: org.hibernate.dialect.PostgreSQLDialect
   rabbitmq:
     addresses: ${SPRING_RABBITMQ_ADDRESSES}
     listener:

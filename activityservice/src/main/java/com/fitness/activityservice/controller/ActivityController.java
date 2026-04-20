@@ -34,7 +34,7 @@ public class ActivityController {
             if (authentication != null && authentication.getPrincipal() instanceof Jwt jwt) {
                 userId = jwt.getSubject();
             } else if (authentication != null) {
-                userId = authentication.getName(); // ✅ fallback
+                userId = authentication.getName();
             } else {
                 log.warn("Unauthorized POST /activities");
                 return ResponseEntity.status(401).build();
@@ -63,7 +63,7 @@ public class ActivityController {
             if (authentication != null && authentication.getPrincipal() instanceof Jwt jwt) {
                 userId = jwt.getSubject();
             } else if (authentication != null) {
-                userId = authentication.getName(); // ✅ fallback
+                userId = authentication.getName();
             } else {
                 log.warn("Unauthorized GET /activities");
                 return ResponseEntity.status(401).build();
@@ -78,11 +78,11 @@ public class ActivityController {
     }
 
     // =========================
-    // GET SINGLE ACTIVITY
+    // GET SINGLE ACTIVITY (FIXED)
     // =========================
     @GetMapping("/{activityId}")
     public ResponseEntity<ActivityResponse> getActivity(
-            @PathVariable String activityId) {
+            @PathVariable Long activityId) {   // ✅ FIXED (String → Long)
 
         try {
             return ResponseEntity.ok(activityService.getActivityById(activityId));

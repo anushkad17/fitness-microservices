@@ -4,10 +4,7 @@ import com.fitness.aiservice.model.Recommendation;
 import com.fitness.aiservice.service.RecommendationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -15,15 +12,29 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/api/recommendations")
 public class RecommendationController {
+
     private final RecommendationService recommendationService;
 
+    // =========================
+    // GET BY USER
+    // =========================
     @GetMapping("/user/{userId}")
-    public ResponseEntity<List<Recommendation>> getUserRecommendation(@PathVariable String userId) {
-        return ResponseEntity.ok(recommendationService.getUserRecommendation(userId));
+    public ResponseEntity<List<Recommendation>> getUserRecommendation(
+            @PathVariable String userId) {
+
+        return ResponseEntity.ok(recommendationService.getByUserId(userId)); // ✅ FIXED
     }
 
+    // =========================
+    // GET BY ACTIVITY
+    // =========================
     @GetMapping("/activity/{activityId}")
-    public ResponseEntity<Recommendation> getActivityRecommendation(@PathVariable String activityId) {
-        return ResponseEntity.ok(recommendationService.getActivityRecommendation(activityId));
+    public ResponseEntity<Recommendation> getActivityRecommendation(
+            @PathVariable String activityId) {
+
+        return ResponseEntity.ok(
+                recommendationService.getByActivityId(activityId) // ✅ FIXED
+        );
     }
 }
+

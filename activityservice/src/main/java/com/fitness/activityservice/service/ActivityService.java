@@ -30,7 +30,7 @@ public class ActivityService {
     private String routingKey;
 
     // ================================
-    // CREATE ACTIVITY (FULL SAFE)
+    // CREATE ACTIVITY
     // ================================
     public ActivityResponse trackActivity(ActivityRequest request) {
 
@@ -52,13 +52,18 @@ public class ActivityService {
                     .duration(request.getDuration())
                     .caloriesBurned(request.getCaloriesBurned())
                     .startTime(request.getStartTime())
-                    .additionalMetrics(request.getAdditionalMetrics())
+                    // ✅ Map → String (Postgres)
+                    .additionalMetrics(
+                            request.getAdditionalMetrics() != null
+                                    ? request.getAdditionalMetrics().toString()
+                                    : null
+                    )
                     .build();
 
             savedActivity = activityRepository.save(activity);
 
         } catch (Exception e) {
-            log.error("❌ MongoDB SAVE FAILED", e);
+            log.error("❌ DB SAVE FAILED", e);
             throw new RuntimeException("Database error while saving activity");
         }
 
@@ -73,7 +78,7 @@ public class ActivityService {
     }
 
     // ================================
-    // GET USER ACTIVITIES (SAFE)
+    // GET USER ACTIVITIES
     // ================================
     public List<ActivityResponse> getUserActivities(String userId) {
 
@@ -84,11 +89,12 @@ public class ActivityService {
         try {
             activities = activityRepository.findAll();
         } catch (Exception e) {
-            log.error("❌ MongoDB FETCH FAILED", e);
+            log.error("❌ DB FETCH FAILED", e);
             return Collections.emptyList();
         }
 
-        if (activities == null || activities.isEmpty()) {
+        // ✅ FIX: remove null check (JPA never returns null)
+        if (activities.isEmpty()) {
             log.warn("No activities found for userId: {}", userId);
             return Collections.emptyList();
         }
@@ -101,13 +107,16 @@ public class ActivityService {
     // ================================
     // GET BY ID
     // ================================
-    public ActivityResponse getActivityById(String activityId) {
+    public ActivityResponse getActivityById(Long activityId) {
         return activityRepository.findById(activityId)
                 .map(this::mapToResponse)
                 .orElseThrow(() ->
                         new RuntimeException("Activity not found with id: " + activityId));
     }
 
+    // ================================
+    // MAPPER
+    // ================================
     private ActivityResponse mapToResponse(Activity activity) {
         if (activity == null) return null;
 
@@ -118,10 +127,14 @@ public class ActivityService {
         response.setDuration(activity.getDuration());
         response.setCaloriesBurned(activity.getCaloriesBurned());
         response.setStartTime(activity.getStartTime());
+
+        // ✅ keep consistent type (String)
         response.setAdditionalMetrics(activity.getAdditionalMetrics());
+
         response.setCreatedAt(activity.getCreatedAt());
         response.setUpdatedAt(activity.getUpdatedAt());
 
         return response;
     }
 }
+

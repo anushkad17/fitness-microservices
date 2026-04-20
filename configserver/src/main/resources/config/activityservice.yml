@@ -10,9 +10,14 @@ spring:
     config:
       enabled: false   # ✅ ADD THIS
 
-  data:
-    mongodb:
-      uri: ${MONGO_ACTIVITY_URI}
+  datasource:
+    url: ${ACTIVITY_DB_URL}
+    username: ${ACTIVITY_DB_USERNAME}
+    password: ${ACTIVITY_DB_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
 
   rabbitmq:
     addresses: ${SPRING_RABBITMQ_ADDRESSES}
