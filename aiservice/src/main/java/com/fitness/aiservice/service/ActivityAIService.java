@@ -44,7 +44,9 @@ public class ActivityAIService {
                     .trim();
 
             JsonNode analysisJson = mapper.readTree(jsonContent);
-            JsonNode analysisNode = analysisJson.path("analysis");
+            JsonNode analysisNode = analysisJson.has("analysis") ? analysisJson.path("analysis") : analysisJson;
+
+            log.info("Parsed JSON Content: {}", analysisJson.toString());
 
             StringBuilder fullAnalysis = new StringBuilder();
             addAnalysisSection(fullAnalysis, analysisNode, "overall", "Overall:");
