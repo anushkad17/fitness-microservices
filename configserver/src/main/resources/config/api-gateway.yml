@@ -7,7 +7,7 @@ spring:
       resourceserver:
         jwt:
           issuer-uri: ${KEYCLOAK_ISSUER_URI}
-          jwk-set-uri: https://keycloak-deploy-st9e.onrender.com/realms/fitness-oauth2/protocol/openid-connect/certs
+
   cloud:
     gateway:
       default-filters:
@@ -15,27 +15,24 @@ spring:
 
       routes:
         - id: userservice
-          uri: lb://userservice
+          uri: https://your-userservice.onrender.com
           predicates:
             - Path=/api/users/**
 
         - id: activityservice
-          uri: lb://activityservice
+          uri: https://activityservice-pcce.onrender.com
           predicates:
             - Path=/api/activities/**
 
         - id: aiservice
-          uri: lb://aiservice
+          uri: https://your-aiservice.onrender.com
           predicates:
             - Path=/api/recommendations/**
 
 server:
   port: 8080
 
+
 eureka:
   client:
-    service-url:
-      defaultZone: https://eureka-server-x9j7.onrender.com/eureka
-
-  instance:
-    prefer-ip-address: true
+    enabled: false
