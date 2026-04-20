@@ -82,7 +82,7 @@ public class ActivityService {
         List<Activity> activities;
 
         try {
-            activities = activityRepository.findByUserId(userId);
+            activities = activityRepository.findAll();
         } catch (Exception e) {
             log.error("❌ MongoDB FETCH FAILED", e);
             return Collections.emptyList();
