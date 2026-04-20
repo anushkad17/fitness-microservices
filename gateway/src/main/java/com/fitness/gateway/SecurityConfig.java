@@ -42,7 +42,7 @@ public class SecurityConfig {
         config.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "X-User-ID"));
         config.setAllowCredentials(true);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/api/**", config);
+        source.registerCorsConfiguration("/**", config);
         return source;
     }
 }
