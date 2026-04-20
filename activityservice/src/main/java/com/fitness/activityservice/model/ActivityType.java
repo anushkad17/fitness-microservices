@@ -32,6 +32,5 @@ public enum ActivityType {
     SKATING,
     SURFING,
     KAYAKING,
-    MARTIAL_ARTS,
-    Other
+    MARTIAL_ARTS
 }

@@ -1,5 +1,6 @@
 package com.fitness.activityservice.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -22,7 +23,10 @@ public class Activity {
     @Id
     private String id;
     private String userId;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     private ActivityType type;
+
     private Integer duration;
     private Integer caloriesBurned;
     private LocalDateTime startTime;
@@ -35,5 +39,7 @@ public class Activity {
 
     @LastModifiedDate
     private LocalDateTime updatedAt;
+
+
 
 }
