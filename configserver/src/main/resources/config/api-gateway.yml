@@ -18,7 +18,7 @@ spring:
         - TokenRelay= # ✅ Automatically passes the JWT to ALL services below
       httpclient:
         connect-timeout: 10000
-        response-timeout: 30s
+        response-timeout: 60s
 
       routes:
         - id: userservice

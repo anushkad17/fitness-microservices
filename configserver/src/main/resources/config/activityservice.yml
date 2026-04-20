@@ -18,9 +18,10 @@ spring:
     password: ${ACTIVITY_DB_PASSWORD}
 
     hikari:
-      max-lifetime: 180000 # 3 minutes
-      connection-timeout: 30000
+      max-lifetime: 240000 # 4 minutes
+      keepalive-time: 30000 # Ping every 30s
       validation-timeout: 5000
+      connection-timeout: 30000
 
   jpa:
     hibernate:
