@@ -38,10 +38,7 @@ public class ActivityAIService {
                     .get(0)
                     .path("text");
 
-            String jsonContent = textNode.asText()
-                    .replaceAll("```json\\n", "")
-                    .replaceAll("\\n```", "")
-                    .trim();
+            String jsonContent = textNode.asText().replaceAll("(?s)```json|```", "").trim();
 
             JsonNode analysisJson = mapper.readTree(jsonContent);
             JsonNode analysisNode = analysisJson.has("analysis") ? analysisJson.path("analysis") : analysisJson;

@@ -4,6 +4,10 @@ spring:
     username: ${AI_DB_USERNAME}
     password: ${AI_DB_PASSWORD}
 
+  cloud:
+    config:
+      enabled: false
+
     jpa:
       hibernate:
         ddl-auto: update
