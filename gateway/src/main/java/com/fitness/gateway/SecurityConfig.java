@@ -20,9 +20,14 @@ public class SecurityConfig {
     public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
         return http
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeExchange(exchange -> exchange
-//                        .pathMatchers("/actuator/*").permitAll()
-                                .anyExchange().authenticated()
+                        // 1. Allow all OPTIONS requests for CORS pre-flight
+                        .pathMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
+                        // 2. Allow Actuator for Render Health Checks
+                        .pathMatchers("/actuator/**").permitAll()
+                        // 3. Everything else needs a token
+                        .anyExchange().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()))
                 .build();

@@ -11,7 +11,7 @@ spring:
   cloud:
     gateway:
       default-filters:
-        - PreserveHostHeader
+        - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials RETAIN_FIRST
 
       routes:
         - id: userservice
