@@ -24,12 +24,9 @@ spring:
 
 eureka:
   client:
-    service-url:
-      defaultZone: https://eureka-server-x9j7.onrender.com/eureka
+    enabled: false
   instance:
     prefer-ip-address: true
-    instance-id: ${spring.application.name}:${server.port}
-
 
 server:
   port: 8083
