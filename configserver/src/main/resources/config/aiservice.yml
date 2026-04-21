@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: ${AI_DB_URL}
-    username: ${AI_DB_USERNAME}
-    password: ${AI_DB_PASSWORD}
+    url: ${SPRING_DATASOURCE_AI_URL}
+    username: ${SPRING_DATASOURCE_AI_USERNAME}
+    password: ${SPRING_DATASOURCE_AI_PASSWORD}
     driver-class-name: org.postgresql.Driver
 
   cloud:
