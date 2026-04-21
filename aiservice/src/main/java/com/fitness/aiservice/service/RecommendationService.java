@@ -71,8 +71,12 @@ public class RecommendationService {
 
     public Recommendation getByActivityId(String activityId) {
         return recommendationRepository.findByActivityId(activityId)
-                .orElseThrow(() ->
-                        new RuntimeException("Recommendation not found for activityId: " + activityId));
+                .orElseGet(() -> {
+                    log.warn("Recommendation pending for activityId: {}", activityId);
+                    return Recommendation.builder()
+                            .recommendation("Your AI analysis is being generated... please refresh in a moment.")
+                            .build();
+                });
     }
 }
 
