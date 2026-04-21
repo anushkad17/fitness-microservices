@@ -1,6 +1,5 @@
 spring:
   application:
     name: aiservice
-
   config:
     import: optional:configserver:https://configserver-hdte.onrender.com

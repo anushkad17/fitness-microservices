@@ -1,4 +1,10 @@
 spring:
+  application:
+    name: aiservice
+    config:
+      import:
+        optional:configserver:
+
   datasource:
     url: ${SPRING_DATASOURCE_AI_URL}
     username: ${SPRING_DATASOURCE_AI_USERNAME}
