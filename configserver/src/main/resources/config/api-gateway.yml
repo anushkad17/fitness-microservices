@@ -6,8 +6,7 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: ${KEYCLOAK_ISSUER_URI}
-
+          jwk-set-uri: https://keycloak-deploy-st9e.onrender.com/realms/fitness-oauth2/protocol/openid-connect/certs
   cloud:
     loadbalancer:
       enabled: false  # ✅ Disables Eureka-style lookup for direct URLs
