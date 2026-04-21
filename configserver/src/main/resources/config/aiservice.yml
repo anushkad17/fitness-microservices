@@ -2,6 +2,9 @@ spring:
   application:
     name: aiservice
 
+  config:
+    import: optional:none
+
 
   datasource:
     url: jdbc:postgresql://ep-wispy-frost-am8hoymc-pooler.c-5.us-east-1.aws.neon.tech:5432/neondb?sslmode=require
