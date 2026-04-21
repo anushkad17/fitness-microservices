@@ -4,9 +4,9 @@ spring:
 
 
   datasource:
-    url: ${SPRING_DATASOURCE_AI_URL}
-    username: ${SPRING_DATASOURCE_AI_USERNAME}
-    password: ${SPRING_DATASOURCE_AI_PASSWORD}
+    url: jdbc:postgresql://ep-wispy-frost-am8hoymc-pooler.c-5.us-east-1.aws.neon.tech:5432/neondb?sslmode=require
+    username: neondb_owner
+    password: npg_Metmp7ufgOc0
     driver-class-name: org.postgresql.Driver
 
   cloud:
