@@ -17,9 +17,5 @@ EXPOSE 8083
 
 # ✅ SHELL FORM: No square brackets!
 # This forces the environment variables to actually expand.
-ENTRYPOINT java -jar app.jar \
-  --spring.datasource.url=${SPRING_DATASOURCE_AI_URL} \
-  --spring.datasource.username=${SPRING_DATASOURCE_AI_USERNAME} \
-  --spring.datasource.password=${SPRING_DATASOURCE_AI_PASSWORD} \
-  --spring.cloud.config.enabled=false \
-  --server.port=8083
+# ✅ No quotes around the variable, and use the 'sh -c' format
+ENTRYPOINT sh -c "java -jar app.jar --spring.datasource.url=${SPRING_DATASOURCE_AI_URL} --spring.datasource.username=${SPRING_DATASOURCE_AI_USERNAME} --spring.datasource.password=${SPRING_DATASOURCE_AI_PASSWORD} --server.port=8083"
