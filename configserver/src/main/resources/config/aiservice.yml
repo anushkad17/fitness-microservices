@@ -22,11 +22,14 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: none        # ✅ Change from 'update' to 'none' temporarily
     show-sql: false
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
+        jdbc:
+          lob:
+            non_contextual_creation: true
     open-in-view: false
 
   security:
@@ -64,6 +67,7 @@ logging:
     root: INFO
     com.fitness.aiservice: DEBUG
     org.springframework.security: DEBUG
+    com.zaxxer.hikari: INFO
 
 rabbitmq:
   exchange:
