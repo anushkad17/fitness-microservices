@@ -1,6 +1,5 @@
 package com.fitness.aiservice.config;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
@@ -15,14 +14,14 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    @Value("${spring.security.oauth2.resourceserver.jwt.jwk-set-uri}")
-    private String jwkSetUri;
+    // ✅ Hardcoded - no @Value needed, no property resolution failure
+    private static final String JWK_SET_URI =
+            "https://keycloak-deploy-st9e.onrender.com/realms/fitness-oauth2/protocol/openid-connect/certs";
 
-    // ✅ Explicitly define JwtDecoder bean
     @Bean
     public JwtDecoder jwtDecoder() {
         return NimbusJwtDecoder
-                .withJwkSetUri(jwkSetUri)
+                .withJwkSetUri(JWK_SET_URI)
                 .build();
     }
 
@@ -44,7 +43,7 @@ public class SecurityConfig {
                 )
 
                 .oauth2ResourceServer(oauth2 -> oauth2
-                        .jwt(jwt -> jwt.decoder(jwtDecoder())) // ✅ Use explicit decoder
+                        .jwt(jwt -> jwt.decoder(jwtDecoder()))
                 );
 
         return http.build();

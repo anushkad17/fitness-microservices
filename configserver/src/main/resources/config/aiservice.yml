@@ -16,35 +16,26 @@ spring:
     hikari:
       maximum-pool-size: 2
       minimum-idle: 1
-      connection-timeout: 20000
+      connection-timeout: 30000
       idle-timeout: 300000
       max-lifetime: 1200000
 
   jpa:
     hibernate:
-      ddl-auto: none        # ✅ Change from 'update' to 'none' temporarily
+      ddl-auto: none
     show-sql: false
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
-        jdbc:
-          lob:
-            non_contextual_creation: true
     open-in-view: false
 
-  security:
-    oauth2:
-      resourceserver:
-        jwt:
-          # ✅ MUST have this to validate JWT from gateway
-          jwk-set-uri: https://keycloak-deploy-st9e.onrender.com/realms/fitness-oauth2/protocol/openid-connect/certs
-
+  # ✅ Remove spring.security block entirely - handled in SecurityConfig.java
 
   rabbitmq:
     addresses: ${SPRING_RABBITMQ_ADDRESSES}
     listener:
       simple:
-        missing-queues-fatal: false  # ✅ Don't crash if queue missing
+        missing-queues-fatal: false
 
   cloud:
     config:
@@ -57,18 +48,6 @@ eureka:
 server:
   port: ${PORT:8083}
 
-gemini:
-  api:
-    url: https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent
-    key: ${GEMINI_API_KEY}
-
-logging:
-  level:
-    root: INFO
-    com.fitness.aiservice: DEBUG
-    org.springframework.security: DEBUG
-    com.zaxxer.hikari: INFO
-
 rabbitmq:
   exchange:
     name: fitness.exchange
@@ -76,3 +55,12 @@ rabbitmq:
     name: activity.queue
   routing:
     key: activity.tracking
+
+gemini:
+  api:
+    key: ${GEMINI_API_KEY}
+
+logging:
+  level:
+    root: INFO
+    com.fitness.aiservice: DEBUG
