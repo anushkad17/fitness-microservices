@@ -11,7 +11,7 @@ spring:
     password: ${SPRING_DATASOURCE_AI_PASSWORD}
     driver-class-name: org.postgresql.Driver
     hikari:
-      maximum-pool-size: 3
+      maximum-pool-size: 2
       minimum-idle: 1
       connection-timeout: 20000
       idle-timeout: 300000
@@ -20,39 +20,36 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
-    show-sql: true
+    show-sql: false
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
-        format_sql: true
     open-in-view: false
 
-  cloud:
-    config:
-      enabled: false
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          # ✅ MUST have this to validate JWT from gateway
+          jwk-set-uri: https://keycloak-deploy-st9e.onrender.com/realms/fitness-oauth2/protocol/openid-connect/certs
+          issuer-uri: https://keycloak-deploy-st9e.onrender.com/realms/fitness-oauth2
 
   rabbitmq:
     addresses: ${SPRING_RABBITMQ_ADDRESSES}
     listener:
       simple:
-        trusted-packages: "*"
+        missing-queues-fatal: false  # ✅ Don't crash if queue missing
+
+  cloud:
+    config:
+      enabled: false
 
 eureka:
   client:
     enabled: false
-  instance:
-    prefer-ip-address: true
 
 server:
   port: ${PORT:8083}
-
-rabbitmq:
-  exchange:
-    name: fitness.exchange
-  queue:
-    name: activity.queue
-  routing:
-    key: activity.tracking
 
 gemini:
   api:
@@ -62,5 +59,13 @@ gemini:
 logging:
   level:
     root: INFO
-    com.fitness: DEBUG
-    com.zaxxer.hikari: DEBUG
+    com.fitness.aiservice: DEBUG
+    org.springframework.security: DEBUG
+
+rabbitmq:
+  exchange:
+    name: fitness.exchange
+  queue:
+    name: activity.queue
+  routing:
+    key: activity.tracking
