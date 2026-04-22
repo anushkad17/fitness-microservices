@@ -3,46 +3,39 @@ spring:
     name: aiservice
 
   config:
-    import: optional:none
+    import: "optional:none"
 
   datasource:
-    # ✅ Add port 5432 explicitly
     url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://ep-wispy-frost-am8hoymc-pooler.c-5.us-east-1.aws.neon.tech:5432/neondb?sslmode=require}
     username: ${SPRING_DATASOURCE_USERNAME:neondb_owner}
     password: ${SPRING_DATASOURCE_PASSWORD:npg_Metmp7ufgOc0}
     driver-class-name: org.postgresql.Driver
     hikari:
-      maximum-pool-size: 5
-      minimum-idle: 2
-      connection-timeout: 30000
-      idle-timeout: 600000
-      # ✅ SSL properties explicitly for Neon
-      data-source-properties:
-        sslmode: require
-        ssl: true
+      maximum-pool-size: 3
+      minimum-idle: 1
+      connection-timeout: 20000
+      idle-timeout: 300000
+      max-lifetime: 1200000
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+    open-in-view: false
 
   cloud:
     config:
       enabled: false
 
-  jpa:
-    hibernate:
-      ddl-auto: update
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
-
   rabbitmq:
-    addresses: ${SPRING_RABBITMQ_ADDRESSES}
+    addresses: ${SPRING_RABBITMQ_ADDRESSES:amqp://guest:guest@localhost:5672}
     listener:
       simple:
-        message-converter:
-          trusted-packages: "*"
-
-logging:
-  level:
-    org.springframework.boot.context.config: DEBUG
-    com.zaxxer.hikari: DEBUG  # ✅ Add this to see actual URL being used
+        trusted-packages: "*"
 
 eureka:
   client:
@@ -51,7 +44,7 @@ eureka:
     prefer-ip-address: true
 
 server:
-  port: ${PORT:8080}
+  port: ${PORT:8083}
 
 rabbitmq:
   exchange:
@@ -63,5 +56,11 @@ rabbitmq:
 
 gemini:
   api:
-    url: https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent
+    url: https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent
     key: ${GEMINI_API_KEY}
+
+logging:
+  level:
+    root: INFO
+    com.fitness: DEBUG
+    com.zaxxer.hikari: DEBUG
