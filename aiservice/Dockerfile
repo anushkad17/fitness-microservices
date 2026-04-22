@@ -1,21 +1,16 @@
-FROM maven:3.9.9-eclipse-temurin-21 AS build
-
+FROM eclipse-temurin:21-jdk AS build
 WORKDIR /app
 COPY pom.xml .
-RUN mvn dependency:go-offline
-
+COPY .mvn .mvn
+COPY mvnw .
+RUN ./mvnw dependency:go-offline -B
 COPY src ./src
 RUN mvn clean package -DskipTests
 
 FROM eclipse-temurin:21-jdk
-
 WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar
 
-# Render needs to see this
-EXPOSE 8083
+EXPOSE 8083 #  Must match PORT env variable
 
-# ✅ SHELL FORM: No square brackets!
-# This forces the environment variables to actually expand.
-# ✅ No quotes around the variable, and use the 'sh -c' format
-ENTRYPOINT sh -c "java -jar app.jar --spring.datasource.url=${SPRING_DATASOURCE_AI_URL} --spring.datasource.username=${SPRING_DATASOURCE_AI_USERNAME} --spring.datasource.password=${SPRING_DATASOURCE_AI_PASSWORD} --server.port=8083"
+ENTRYPOINT ["java", "-jar", "app.jar"]

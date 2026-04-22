@@ -10,9 +10,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @EntityScan("com.fitness.aiservice.model")
 @EnableJpaRepositories("com.fitness.aiservice.repository")
 @EnableRabbit
-@SpringBootApplication(
-		exclude = {DataSourceAutoConfiguration.class} // ✅ Let our custom bean handle it
-)
+@SpringBootApplication
 public class AiserviceApplication {
 
 	public static void main(String[] args) {
