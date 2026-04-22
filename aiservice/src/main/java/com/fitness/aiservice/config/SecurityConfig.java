@@ -1,16 +1,30 @@
 package com.fitness.aiservice.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+
+    @Value("${spring.security.oauth2.resourceserver.jwt.jwk-set-uri}")
+    private String jwkSetUri;
+
+    // ✅ Explicitly define JwtDecoder bean
+    @Bean
+    public JwtDecoder jwtDecoder() {
+        return NimbusJwtDecoder
+                .withJwkSetUri(jwkSetUri)
+                .build();
+    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http)
@@ -23,17 +37,14 @@ public class SecurityConfig {
                 )
 
                 .authorizeHttpRequests(auth -> auth
-                        // ✅ Public endpoints
                         .requestMatchers("/health").permitAll()
                         .requestMatchers("/").permitAll()
                         .requestMatchers("/actuator/**").permitAll()
-                        // ✅ All API endpoints need JWT
                         .anyRequest().authenticated()
                 )
 
-                // ✅ JWT validation
                 .oauth2ResourceServer(oauth2 -> oauth2
-                        .jwt(Customizer.withDefaults())
+                        .jwt(jwt -> jwt.decoder(jwtDecoder())) // ✅ Use explicit decoder
                 );
 
         return http.build();

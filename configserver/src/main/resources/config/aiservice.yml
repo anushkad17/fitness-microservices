@@ -35,7 +35,7 @@ spring:
         jwt:
           # ✅ MUST have this to validate JWT from gateway
           jwk-set-uri: https://keycloak-deploy-st9e.onrender.com/realms/fitness-oauth2/protocol/openid-connect/certs
-          issuer-uri: https://keycloak-deploy-st9e.onrender.com/realms/fitness-oauth2
+
 
   rabbitmq:
     addresses: ${SPRING_RABBITMQ_ADDRESSES}
