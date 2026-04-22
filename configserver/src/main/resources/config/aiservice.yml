@@ -6,9 +6,9 @@ spring:
     import: "optional:none"
 
   datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://ep-wispy-frost-am8hoymc-pooler.c-5.us-east-1.aws.neon.tech:5432/neondb?sslmode=require}
-    username: ${SPRING_DATASOURCE_USERNAME:neondb_owner}
-    password: ${SPRING_DATASOURCE_PASSWORD:npg_Metmp7ufgOc0}
+    url: ${SPRING_DATASOURCE_AI_URL}
+    username: ${SPRING_DATASOURCE_AI_USERNAME}
+    password: ${SPRING_DATASOURCE_AI_PASSWORD}
     driver-class-name: org.postgresql.Driver
     hikari:
       maximum-pool-size: 3
@@ -32,7 +32,7 @@ spring:
       enabled: false
 
   rabbitmq:
-    addresses: ${SPRING_RABBITMQ_ADDRESSES:amqp://guest:guest@localhost:5672}
+    addresses: ${SPRING_RABBITMQ_ADDRESSES}
     listener:
       simple:
         trusted-packages: "*"

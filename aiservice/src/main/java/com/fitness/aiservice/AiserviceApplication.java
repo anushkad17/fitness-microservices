@@ -3,9 +3,16 @@ package com.fitness.aiservice;
 import org.springframework.amqp.rabbit.annotation.EnableRabbit;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
+@EntityScan("com.fitness.aiservice.model")
+@EnableJpaRepositories("com.fitness.aiservice.repository")
 @EnableRabbit
-@SpringBootApplication
+@SpringBootApplication(
+		exclude = {DataSourceAutoConfiguration.class} // ✅ Let our custom bean handle it
+)
 public class AiserviceApplication {
 
 	public static void main(String[] args) {
