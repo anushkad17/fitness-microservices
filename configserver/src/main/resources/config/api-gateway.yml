@@ -7,17 +7,39 @@ spring:
       resourceserver:
         jwt:
           jwk-set-uri: https://keycloak-deploy-st9e.onrender.com/realms/fitness-oauth2/protocol/openid-connect/certs
+
   cloud:
     loadbalancer:
-      enabled: false  # ✅ Disables Eureka-style lookup for direct URLs
+      enabled: false
 
     gateway:
       default-filters:
         - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials RETAIN_FIRST
-        - TokenRelay= # ✅ Automatically passes the JWT to ALL services below
+        - TokenRelay=
+
       httpclient:
         connect-timeout: 10000
         response-timeout: 60s
+
+      # ✅ CORS Configuration Added
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins:
+              - "https://fitness-frontend-6ogz.onrender.com"  # ✅ Replace with your frontend URL
+              - "http://localhost:5173"
+              - "http://localhost:3000"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+              - PATCH
+            allowedHeaders:
+              - "*"
+            allowCredentials: true
+            maxAge: 3600
 
       routes:
         - id: userservice
@@ -30,15 +52,30 @@ spring:
           predicates:
             - Path=/api/activities/**
 
-
         - id: aiservice
           uri: https://aiservice-z1dw.onrender.com
           predicates:
             - Path=/api/recommendations/**
 
 server:
-  port: 8080
+  port: ${PORT:8080}
 
 eureka:
   client:
     enabled: false
+
+# ✅ Enable actuator to debug routes
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, gateway, info
+  endpoint:
+    gateway:
+      enabled: true
+
+logging:
+  level:
+    org.springframework.cloud.gateway: DEBUG   # ✅ See routing decisions
+    org.springframework.security: DEBUG        # ✅ See auth decisions
+    reactor.netty: DEBUG
