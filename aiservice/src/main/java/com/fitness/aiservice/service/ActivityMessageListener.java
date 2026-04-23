@@ -16,19 +16,29 @@ public class ActivityMessageListener {
     private final ActivityAIService aiService;
     private final RecommendationRepository recommendationRepository;
 
-    @RabbitListener(queues = "activity.queue")
+    @RabbitListener(queues = "${rabbitmq.queue.name}")  // ✅ Use property
     public void processActivity(Activity activity) {
-        try {
-            log.info("📥 Received activity for AI processing. ID: {}", activity.getId());
+        log.info("====================================");
+        log.info("📥 RECEIVED MESSAGE FROM RABBITMQ");
+        log.info("Activity ID: {}", activity.getId());
+        log.info("Activity Type: {}", activity.getType());
+        log.info("User ID: {}", activity.getUserId());
+        log.info("====================================");
 
+        try {
             Recommendation recommendation = aiService.generateRecommendation(activity);
 
             if (recommendation != null) {
-                recommendationRepository.save(recommendation);
-                log.info("✅ AI Recommendation saved for activity: {}", activity.getId());
+                Recommendation saved = recommendationRepository.save(recommendation);
+                log.info("✅ Saved recommendation ID: {} for activity: {}",
+                        saved.getId(), activity.getId());
+            } else {
+                log.warn("⚠️ Null recommendation returned for activity: {}",
+                        activity.getId());
             }
         } catch (Exception e) {
-            log.error("❌ Failed to process AI recommendation for activity {}: {}", activity.getId(), e.getMessage());
+            log.error("❌ Failed to process activity {}: {}",
+                    activity.getId(), e.getMessage(), e);
         }
     }
 }

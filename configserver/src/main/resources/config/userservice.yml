@@ -1,5 +1,7 @@
 server:
   port: 8081
+  config:
+    import: optional:none
 
 spring:
   datasource:
