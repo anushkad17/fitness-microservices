@@ -21,43 +21,39 @@ public class KeycloakUserSyncFilter implements WebFilter {
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
-
+        String path = exchange.getRequest().getURI().getPath();
         String token = exchange.getRequest().getHeaders().getFirst("Authorization");
 
-        // 1. If no token or invalid format → continue the request chain immediately
-        if (token == null || !token.startsWith("Bearer ")) {
+        // ✅ FIX 1: Only run for API calls, ignore static assets/actuator
+        if (!path.startsWith("/api") || token == null || !token.startsWith("Bearer ")) {
             return chain.filter(exchange);
         }
 
         RegisterRequest registerRequest = getUserDetails(token);
-
-        // 2. If parsing fails or required ID is missing → continue request
         if (registerRequest == null || registerRequest.getKeycloakId() == null) {
             return chain.filter(exchange);
         }
 
         String userId = registerRequest.getKeycloakId();
 
-        // 3. Execute User Sync with Error Resilience
-        return userService.validateUser(userId)
+        // ✅ FIX 2: Run the sync in the background without waiting for it
+        // We call subscribe() so it doesn't block the actual API request to Activities/AI
+        userService.validateUser(userId)
                 .flatMap(exist -> {
-                    // Using Boolean.FALSE.equals for null-safety
                     if (Boolean.FALSE.equals(exist)) {
-                        log.info("User {} not found in local database. Triggering registration sync...", userId);
-                        return userService.registerUser(registerRequest).then();
+                        log.info("Syncing user: {}", userId);
+                        return userService.registerUser(registerRequest);
                     }
                     return Mono.empty();
                 })
-                /* * ✅ CRITICAL FIX:
-                 * If the User Service call fails (502, 503, or Connection Refused),
-                 * we catch it here and return Mono.empty(). This prevents the
-                 * Gateway from returning a 500 error to the browser.
-                 */
                 .onErrorResume(e -> {
-                    log.error("User Sync Background Process Failed: {}. Continuing main request.", e.getMessage());
+                    log.error("Background Sync Failed (likely 429): {}", e.getMessage());
                     return Mono.empty();
                 })
-                .then(chain.filter(exchange));
+                .subscribe(); // 🔥 This is the key: it runs async
+
+        // Immediately continue to the actual microservice (Activity/AI)
+        return chain.filter(exchange);
     }
 
     private RegisterRequest getUserDetails(String token) {

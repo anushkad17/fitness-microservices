@@ -45,14 +45,14 @@ spring:
 
       routes:
         - id: userservice
-          uri: https://userservice-n20l.onrender.com
+          uri: https://userservice-n20l:8080
           predicates:
             - Path=/api/users/**
           filters:
             - StripPrefix=1
 
         - id: activityservice
-          uri: https://activityservice-pcce.onrender.com
+          uri: https://activityservice-pcce:8080
           predicates:
             - Path=/api/activities/**
           filters:
