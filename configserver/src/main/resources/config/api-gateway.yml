@@ -48,16 +48,22 @@ spring:
           uri: https://userservice-n20l.onrender.com
           predicates:
             - Path=/api/users/**
+          filters:
+            - StripPrefix=1
 
         - id: activityservice
           uri: https://activityservice-pcce.onrender.com
           predicates:
             - Path=/api/activities/**
+          filters:
+            - StripPrefix=1
 
         - id: aiservice
           uri: https://aiservice-z1dw.onrender.com
           predicates:
             - Path=/api/recommendations/**
+          filters:
+            - StripPrefix=1
 
 server:
   port: ${PORT:8080}
