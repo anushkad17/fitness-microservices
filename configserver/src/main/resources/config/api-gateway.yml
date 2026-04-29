@@ -45,21 +45,22 @@ spring:
 
       routes:
         - id: userservice
-          uri: https://userservice-n20l:8080
+          uri: http://userservice-n20l:8080 # Changed https to http
           predicates:
             - Path=/api/users/**
           filters:
             - StripPrefix=1
 
         - id: activityservice
-          uri: https://activityservice-pcce:8080
+          uri: http://activityservice-pcce:8080 # Changed https to http
           predicates:
             - Path=/api/activities/**
           filters:
             - StripPrefix=1
 
         - id: aiservice
-          uri: https://aiservice-z1dw.onrender.com
+          # Recommendation: Use internal URL here too if possible
+          uri: http://aiservice-z1dw:8083
           predicates:
             - Path=/api/recommendations/**
           filters:
