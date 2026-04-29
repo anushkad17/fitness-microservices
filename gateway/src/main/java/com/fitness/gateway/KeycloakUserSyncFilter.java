@@ -11,6 +11,7 @@ import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilter;
 import org.springframework.web.server.WebFilterChain;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 @Component
 @Slf4j
@@ -24,35 +25,39 @@ public class KeycloakUserSyncFilter implements WebFilter {
         String path = exchange.getRequest().getURI().getPath();
         String token = exchange.getRequest().getHeaders().getFirst("Authorization");
 
-        // ✅ FIX 1: Only run for API calls, ignore static assets/actuator
+        // 1. Only run for API calls and ensure we have a Bearer token
         if (!path.startsWith("/api") || token == null || !token.startsWith("Bearer ")) {
             return chain.filter(exchange);
         }
 
         RegisterRequest registerRequest = getUserDetails(token);
+
+        // 2. If parsing fails, just continue the request chain
         if (registerRequest == null || registerRequest.getKeycloakId() == null) {
             return chain.filter(exchange);
         }
 
         String userId = registerRequest.getKeycloakId();
 
-        // ✅ FIX 2: Run the sync in the background without waiting for it
-        // We call subscribe() so it doesn't block the actual API request to Activities/AI
+        // 3. ASYNCHRONOUS BACKGROUND SYNC
+        // We do NOT return this Mono. We subscribe on a separate thread pool
+        // to ensure the main request to ActivityService/AIService proceeds immediately.
         userService.validateUser(userId)
                 .flatMap(exist -> {
                     if (Boolean.FALSE.equals(exist)) {
-                        log.info("Syncing user: {}", userId);
+                        log.info("User {} not found in local database. Triggering background registration...", userId);
                         return userService.registerUser(registerRequest);
                     }
                     return Mono.empty();
                 })
+                .subscribeOn(Schedulers.boundedElastic()) // Run on a background thread pool
                 .onErrorResume(e -> {
-                    log.error("Background Sync Failed (likely 429): {}", e.getMessage());
+                    log.error("Background User Sync Failed: {}. Request continues.", e.getMessage());
                     return Mono.empty();
                 })
-                .subscribe(); // 🔥 This is the key: it runs async
+                .subscribe(); // Execute fire-and-forget
 
-        // Immediately continue to the actual microservice (Activity/AI)
+        // 4. Immediately continue the main filter chain
         return chain.filter(exchange);
     }
 
@@ -69,7 +74,6 @@ public class KeycloakUserSyncFilter implements WebFilter {
 
             // Password is dummy because authentication is handled by Keycloak
             registerRequest.setPassword("dummy@123123");
-
             registerRequest.setFirstName(claims.getStringClaim("given_name"));
             registerRequest.setLastName(claims.getStringClaim("family_name"));
 
