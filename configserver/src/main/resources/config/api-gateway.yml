@@ -45,14 +45,14 @@ spring:
 
       routes:
         - id: userservice
-          uri: http://userservice-n20l:8080 # Changed https to http
+          uri: http://userservice-n20l:8081 # Changed https to http
           predicates:
             - Path=/api/users/**
           filters:
             - StripPrefix=1
 
         - id: activityservice
-          uri: http://activityservice-pcce:8080 # Changed https to http
+          uri: http://activityservice-pcce:8082 # Changed https to http
           predicates:
             - Path=/api/activities/**
           filters:
