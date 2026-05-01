@@ -16,7 +16,7 @@ public class WebClientConfig {
     public WebClient userServiceWebClient(WebClient.Builder webClientBuilder) {
         return webClientBuilder
                 // ✅ Using http, internal hostname, and your 8081 port
-                .baseUrl("http://userservice-n20l:8081")
+                .baseUrl("https://userservice-n20l.onrender.com:8081")
                 .build();
     }
 }
