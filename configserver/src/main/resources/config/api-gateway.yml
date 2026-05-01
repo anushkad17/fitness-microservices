@@ -55,8 +55,7 @@ spring:
           uri: http://activityservice-pcce:8082 # Changed https to http
           predicates:
             - Path=/api/activities/**
-          filters:
-            - StripPrefix=1
+
 
         - id: aiservice
           # Recommendation: Use internal URL here too if possible
