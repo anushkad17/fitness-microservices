@@ -52,7 +52,7 @@ spring:
             - StripPrefix=1
 
         - id: activityservice
-          uri: http://activityservice-pcce:8082 # Changed https to http
+          uri: http://activityservice-pcce.onrender.com:8082 # Changed https to http
           predicates:
             - Path=/api/activities/**
 
